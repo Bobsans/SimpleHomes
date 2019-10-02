@@ -1,0 +1,10 @@
+# idea
+.idea
+*.iml
+out
+
+# project
+.gradle
+build
+classes
+run

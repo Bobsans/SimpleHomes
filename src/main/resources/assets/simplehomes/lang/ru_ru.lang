@@ -1,0 +1,7 @@
+bobsans.simplehomes.config.allowWarpPoints=Разрешить варп поинты
+bobsans.simplehomes.config.allowWarpPoints.tooltip=Разрешить установку варп поинтов
+bobsans.simplehomes.config.maximumWarpPoints=Максимум варп поинтов
+bobsans.simplehomes.config.maximumWarpPoints.tooltip=Максимум вар поинтов для одного игрока
+
+bobsans.simplehomes.keys.general=SimpleHomes
+bobsans.simplehomes.keys.fastHome=Быстрый телепорт домой

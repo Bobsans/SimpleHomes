@@ -49,6 +49,7 @@ public class SimpleHomesMod {
         event.registerServerCommand(new CommandMeet());
         event.registerServerCommand(new CommandSetWarp());
         event.registerServerCommand(new CommandDelWarp());
+        event.registerServerCommand(new CommandListWarps());
         event.registerServerCommand(new CommandWarp());
     }
 }

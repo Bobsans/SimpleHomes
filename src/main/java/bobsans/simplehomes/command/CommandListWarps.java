@@ -2,6 +2,7 @@ package bobsans.simplehomes.command;
 
 import bobsans.simplehomes.config.Config;
 import bobsans.simplehomes.types.PlayerData;
+import bobsans.simplehomes.types.WarpPoint;
 import bobsans.simplehomes.utils.Storage;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -11,14 +12,16 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.TextComponentString;
 
+import java.util.Map;
 
-public class CommandDelWarp extends CommandBase {
+
+public class CommandListWarps extends CommandBase {
     public String getName() {
-        return "delwarp";
+        return "listwarps";
     }
 
     public String getUsage(ICommandSender sender) {
-        return "Use /delwarp <name> to remove warp point.";
+        return "Use /listwarps to show list of warp points.";
     }
 
     public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
@@ -26,7 +29,7 @@ public class CommandDelWarp extends CommandBase {
     }
 
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if (args.length == 1) {
+        if (args.length == 0) {
             EntityPlayer player = (EntityPlayer)sender;
             Storage storage = Storage.get(player.world);
 
@@ -36,14 +39,11 @@ public class CommandDelWarp extends CommandBase {
 
             PlayerData data = storage.load(PlayerData.class, player.getUniqueID().toString()).setPlayer(player);
 
-            if (data.warps.containsKey(args[0])) {
-                storage.save(data.deleteWarp(args[0]));
-                sender.sendMessage(new TextComponentString("Waypoint §4" +  args[0] + "§r deleted"));
-            } else {
-                sender.sendMessage(new TextComponentString("Waypoint §4" + args[0] + "§r not exists"));
+            for (Map.Entry<String, WarpPoint> entry : data.warps.entrySet()) {
+                sender.sendMessage(new TextComponentString(entry.getKey() + ": " + entry.getValue().x + ", " + entry.getValue().y + ", " + entry.getValue().z));
             }
         } else {
-            throw new WrongUsageException("Command /delwarp take one argument.");
+            throw new WrongUsageException("Command /listwarps no take arguments.");
         }
     }
 }

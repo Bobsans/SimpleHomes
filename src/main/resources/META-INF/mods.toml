@@ -1,0 +1,26 @@
+modLoader="javafml"
+loaderVersion="[28,)"
+
+[[mods]]
+    modId="simplehomes"
+    version="1.0.4"
+    displayName="Simple Homes"
+    updateJSONURL="https://minecraft.darkboy.ru/api/check-mod-updates/simplehomes.json"
+    displayURL="https://minecraft.darkboy.ru/mods/simplehomes"
+    credits="Simple: homes."
+    authors="Bobsans"
+    description='''Lost in a cave? /home will solve your problems.'''
+
+    [[dependencies.simplehomes]]
+        modId="forge"
+        mandatory=true
+        versionRange="[28,)"
+        ordering="NONE"
+        side="BOTH"
+
+    [[dependencies.simplehomes]]
+        modId="minecraft"
+        mandatory=true
+        versionRange="[1.14.4]"
+        ordering="NONE"
+        side="BOTH"

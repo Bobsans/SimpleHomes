@@ -1,0 +1,26 @@
+{
+    "simplehomes.title": "Simple Homes",
+
+    "simplehomes.keys.fastHome": "Быстрый телепорт домой",
+
+    "simplehomes.config.title": "Настройки Simple Homes",
+
+    "simplehomes.config.common.allowWarpPoints": "Разрешить варп-точки",
+    "simplehomes.config.common.allowWarpPoints.desc": "Разрешить установку варп-точек.",
+    "simplehomes.config.common.maximumWarpPoints": "Максимум варп-точек",
+    "simplehomes.config.common.maximumWarpPoints.desc": "Максимум варп-точек для одного игрока.",
+
+    "simplehomes.commands.argument.warp.doesNotExists": "Варп-точки с именем \"%s\" не существует",
+    "simplehomes.commands.argument.playerData.doesNotExists": "У игрока \"%s\" нет дома",
+
+    "simplehomes.commands.setHome": "Дом установлен!",
+    "simplehomes.commands.meet": "Вы прибыли домой к %s!",
+    "simplehomes.commands.meet.hasNoHome": "У %s нет дома...",
+    "simplehomes.commands.meet.playerNotFound": "Игрок \"%s\" не найден",
+    "simplehomes.commands.goHome": "Добро пожаловать домой!",
+    "simplehomes.commands.goHome.notSet": "Сначала установите точку дома! §5[/home set]§r",
+    "simplehomes.commands.setWarp": "Варп-точка \"%s\" установлена",
+    "simplehomes.commands.setWarp.reachedMaximum": "Вы достигли лимита варп-точек.",
+    "simplehomes.commands.deleteWarp": "Варп-точка \"%s\" удалена.",
+    "simplehomes.commands.warpsList.empty": "У вас нет установленных варп-точек."
+}

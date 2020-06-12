@@ -1,0 +1,26 @@
+{
+  "simplehomes.title": "Simple Homes",
+
+  "simplehomes.keys.fastHome": "Fast home teleporting",
+
+  "simplehomes.config.title": "Simple Homes config",
+
+  "simplehomes.config.common.allowWarpPoints": "Allow warp points",
+  "simplehomes.config.common.allowWarpPoints.desc": "Allow warp points setting.",
+  "simplehomes.config.common.maximumWarpPoints": "Maximim warp points",
+  "simplehomes.config.common.maximumWarpPoints.desc": "Maximim warp points per user.",
+
+  "simplehomes.commands.argument.warp.doesNotExists": "Warp point named \"%s\" does not exist",
+  "simplehomes.commands.argument.playerData.doesNotExists": "Player \"%s\" no have home",
+
+  "simplehomes.commands.setHome": "Home set!",
+  "simplehomes.commands.meet": "You arrived home to %s!",
+  "simplehomes.commands.meet.hasNoHome": "%s has no home...",
+  "simplehomes.commands.meet.playerNotFound": "Player \"%s\" not found",
+  "simplehomes.commands.goHome": "Welcome home!",
+  "simplehomes.commands.goHome.notSet": "Set a home first! §5[/home set]§r",
+  "simplehomes.commands.setWarp": "Warp \"%s\" set",
+  "simplehomes.commands.setWarp.reachedMaximum": "You have already reached maximum warp points.",
+  "simplehomes.commands.deleteWarp": "Warp \"%s\" deleted.",
+  "simplehomes.commands.warpsList.empty": "You do not have waprs."
+}

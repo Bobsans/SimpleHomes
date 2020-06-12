@@ -1,52 +1,76 @@
 package bobsans.simplehomes.utils;
 
-import bobsans.simplehomes.types.WarpPoint;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import bobsans.simplehomes.core.WarpPoint;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.*;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
-import net.minecraft.world.Teleporter;
-import net.minecraft.world.WorldServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
+import net.minecraft.world.storage.WorldInfo;
+import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.fml.hooks.BasicEventHooks;
 
 
-public class PlayerTeleporter extends Teleporter {
-    private boolean coordCalc;
-    private WarpPoint warpPoint;
+public class PlayerTeleporter {
+    public static void teleport(PlayerEntity player, WarpPoint to) {
+        DimensionType oldDimension = player.getEntityWorld().getDimension().getType();
 
-    public PlayerTeleporter(WorldServer worldIn, WarpPoint warpPoint, boolean doCoordCalc) {
-        super(worldIn);
-        this.coordCalc = doCoordCalc;
-        this.warpPoint = warpPoint;
-    }
-
-    public static void transferPlayer(MinecraftServer server, EntityPlayer player, WarpPoint to) {
-        WorldServer currentWorld = server.getWorld(player.getEntityWorld().provider.getDimension());
-        WorldServer destinationWorld = server.getWorld(to.dimension);
-
-        EntityPlayerMP playerMP = (EntityPlayerMP)player;
-
-        if (destinationWorld != currentWorld) {
-            PlayerList list = server.getPlayerList();
-            list.transferPlayerToDimension(playerMP, to.dimension, new PlayerTeleporter(destinationWorld, to, true));
+        if (!oldDimension.equals(to.dimension)) {
+            ServerPlayerEntity serverPlayer = (ServerPlayerEntity) player;
+            MinecraftServer server = player.getEntityWorld().getServer();
+            if (server != null && server.getWorld(to.dimension) != null) {
+                changeDimension(serverPlayer, new BlockPos(to.x, to.y, to.z), to.dimension);
+            }
         }
 
         player.rotationYaw = to.yaw;
         player.rotationPitch = to.pitch;
         player.setPositionAndUpdate(to.x, to.y, to.z);
-        playerMP.setPositionAndUpdate(to.x, to.y, to.z);
     }
 
-    public void placeInPortal(Entity entityIn, float rotationYaw) {
-        if (this.coordCalc) {
-            entityIn.setLocationAndAngles(warpPoint.x, warpPoint.y, warpPoint.z, warpPoint.yaw, warpPoint.pitch);
-            entityIn.motionX = 0.0D;
-            entityIn.motionY = 0.0D;
-            entityIn.motionZ = 0.0D;
+    public static void changeDimension(ServerPlayerEntity player, BlockPos pos, DimensionType type) {
+        if (!ForgeHooks.onTravelToDimension(player, type)) {
+            return;
         }
-    }
 
-    public boolean placeInExistingPortal(Entity entityIn, float rotationYaw) {
-        return false;
+        DimensionType dimensiontype = player.dimension;
+
+        ServerWorld srcWorld = player.server.getWorld(dimensiontype);
+        player.dimension = type;
+        ServerWorld destWorld = player.server.getWorld(type);
+        WorldInfo worldinfo = player.world.getWorldInfo();
+        player.connection.sendPacket(new SRespawnPacket(type, worldinfo.getGenerator(), player.interactionManager.getGameType()));
+        player.connection.sendPacket(new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
+        PlayerList playerlist = player.server.getPlayerList();
+        playerlist.updatePermissionLevel(player);
+        srcWorld.removeEntity(player, true);
+        player.revive();
+        float f = player.rotationPitch;
+        float f1 = player.rotationYaw;
+
+        player.setLocationAndAngles(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
+        srcWorld.getProfiler().endSection();
+        srcWorld.getProfiler().startSection("placing");
+        player.setLocationAndAngles(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
+
+        srcWorld.getProfiler().endSection();
+        player.setWorld(destWorld);
+        destWorld.func_217447_b(player);
+        player.connection.setPlayerLocation(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
+        player.interactionManager.setWorld(destWorld);
+        player.connection.sendPacket(new SPlayerAbilitiesPacket(player.abilities));
+        playerlist.sendWorldInfo(player, destWorld);
+        playerlist.sendInventory(player);
+
+        for (EffectInstance effectinstance : player.getActivePotionEffects()) {
+            player.connection.sendPacket(new SPlayEntityEffectPacket(player.getEntityId(), effectinstance));
+        }
+
+        player.connection.sendPacket(new SPlaySoundEventPacket(1032, BlockPos.ZERO, 0, false));
+        BasicEventHooks.firePlayerChangedDimensionEvent(player, dimensiontype, type);
     }
 }

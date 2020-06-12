@@ -1,82 +1,108 @@
 package bobsans.simplehomes.command;
 
+import bobsans.simplehomes.Reference;
+import bobsans.simplehomes.command.arguments.WarpPointNameArgument;
 import bobsans.simplehomes.config.Config;
-import bobsans.simplehomes.types.PlayerData;
-import bobsans.simplehomes.types.WarpPoint;
+import bobsans.simplehomes.core.PlayerData;
+import bobsans.simplehomes.core.PlayerDataManager;
+import bobsans.simplehomes.core.WarpPoint;
 import bobsans.simplehomes.utils.PlayerTeleporter;
-import bobsans.simplehomes.utils.Storage;
-import net.minecraft.command.CommandBase;
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.command.WrongUsageException;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import net.minecraft.command.CommandSource;
+import net.minecraft.command.Commands;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 
 public class CommandWarp extends CommandBase {
-    public String getName() {
-        return "warp";
+    public static void register(CommandDispatcher<CommandSource> dispatcher) {
+        dispatcher.register(build());
     }
 
-    public String getUsage(ICommandSender sender) {
-        return "Use /warp <name> for teleport to passed warp location.";
+    static LiteralArgumentBuilder<CommandSource> build() {
+        return Commands.literal("warp")
+            .requires((source) -> Config.COMMON.ALLOW_WARP_POINTS.get())
+            .then(Commands
+                .literal("set")
+                .then(Commands
+                    .argument("name", StringArgumentType.word())
+                    .executes((context) -> setWarp(context, context.getSource().asPlayer(), StringArgumentType.getString(context, "name")))))
+            .then(Commands
+                .literal("delete")
+                .then(Commands
+                    .argument("name", WarpPointNameArgument.name())
+                    .executes((context) -> deleteWarp(context, context.getSource().asPlayer(), WarpPointNameArgument.getName(context, "name")))))
+            .then(Commands
+                .literal("list")
+                .executes((context) -> warpsList(context, context.getSource().asPlayer())))
+            .then(Commands
+                .argument("name", WarpPointNameArgument.name())
+                .executes((context) -> warp(context, context.getSource().asPlayer(), WarpPointNameArgument.getName(context, "name"))));
     }
 
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return sender instanceof EntityPlayer && Config.ALLOW_WARP_POINTS;
-    }
+    public static int setWarp(CommandContext<CommandSource> context, PlayerEntity player, String name) throws CommandException {
+        PlayerDataManager manager = PlayerDataManager.load();
+        PlayerData playerData = manager.getOrCreate(player);
 
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
-        EntityPlayer player = (EntityPlayer)sender;
-        ArrayList<String> result = new ArrayList<>();
-
-        Storage storage = Storage.get(player.world);
-        if (storage == null) {
-            return result;
+        if (playerData.warps.size() >= Config.COMMON.MAXIMUM_WARP_POINTS.get()) {
+            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.setWarp.reachedMaximum"));
         }
 
-        PlayerData data = storage.load(PlayerData.class, player.getUniqueID().toString());
+        playerData.addWarp(new WarpPoint(player, name));
+        manager.markDirty();
 
-        if (args.length == 1) {
-            for (String name : data.warps.keySet()) {
-                if (name.startsWith(args[0])) {
-                    result.add(name);
-                }
+        sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.setWarp", name));
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int deleteWarp(CommandContext<CommandSource> context, PlayerEntity player, String warpName) throws CommandException {
+        PlayerDataManager manager = PlayerDataManager.load();
+        PlayerData playerData = manager.getOrCreate(player);
+
+        if (playerData.warps.containsKey(warpName)) {
+            manager.getOrCreate(player).warps.remove(warpName);
+            manager.markDirty();
+            sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.deleteWarp", warpName));
+        } else {
+            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    public static int warpsList(CommandContext<CommandSource> context, PlayerEntity player) throws CommandException {
+        PlayerDataManager manager = PlayerDataManager.load();
+        PlayerData playerData = manager.getOrCreate(player);
+
+        if (playerData.warps.size() > 0) {
+            for (WarpPoint warp : playerData.warps.values()) {
+                String coords = String.format("%.2f", warp.x) + ", " + String.format("%.2f", warp.y) + ", " + String.format("%.2f", warp.z);
+                sendFeedback(context.getSource(), new StringTextComponent(warp.name + ": " + coords));
             }
         } else {
-            result.addAll(data.warps.keySet());
+            sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.warpsList.empty"));
         }
 
-        return result;
+        return Command.SINGLE_SUCCESS;
     }
 
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if (args.length == 1) {
-            EntityPlayer player = (EntityPlayer)sender;
+    public static int warp(CommandContext<CommandSource> context, PlayerEntity player, String warpName) throws CommandException {
+        PlayerDataManager manager = PlayerDataManager.load();
+        PlayerData playerData = manager.getOrCreate(player);
 
-            Storage storage = Storage.get(player.world);
-
-            if (storage == null) {
-                throw new CommandException("Unable to load warp list.");
-            }
-
-            PlayerData data = storage.load(PlayerData.class, player.getUniqueID().toString());
-            for (Map.Entry<String, WarpPoint> entry: data.warps.entrySet()) {
-                if (entry.getKey().equals(args[0])) {
-                    PlayerTeleporter.transferPlayer(server, player, entry.getValue());
-                    return;
-                }
-            }
-
-            throw new CommandException("Warp point with name \"" + args[0] + "\" not exist!");
+        if (playerData.warps.containsKey(warpName)) {
+            PlayerTeleporter.teleport(player, playerData.warps.get(warpName));
         } else {
-            throw new WrongUsageException("Command /warp take one arguments.");
+            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
         }
+
+        return Command.SINGLE_SUCCESS;
     }
 }

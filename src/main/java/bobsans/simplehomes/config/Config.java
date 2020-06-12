@@ -1,55 +1,49 @@
 package bobsans.simplehomes.config;
 
 import bobsans.simplehomes.Reference;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import bobsans.simplehomes.SimpleHomes;
+import com.electronwill.nightconfig.core.file.CommentedFileConfig;
+import com.electronwill.nightconfig.core.io.WritingMode;
+import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.loading.FMLPaths;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.nio.file.Path;
 
 public class Config {
-    public static boolean ALLOW_WARP_POINTS = true;
-    public static int MAXIMUM_WARP_POINTS = 10;
+    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
+    public static final Common COMMON = new Common(BUILDER);
+    public static final ForgeConfigSpec spec = BUILDER.build();
 
-    // Realization
+    public static class Common {
+        public final ForgeConfigSpec.BooleanValue ALLOW_WARP_POINTS;
+        public final ForgeConfigSpec.IntValue MAXIMUM_WARP_POINTS;
 
-    public static Configuration config;
-
-    public static void init(File configFile) {
-        config = new Configuration(configFile);
-        syncConfig();
-
-        MinecraftForge.EVENT_BUS.register(ConfigChangeHandler.class);
-    }
-
-    private static void syncConfig() {
-        config.load();
-
-        List<String> orderedKeys = new ArrayList<>();
-
-        ALLOW_WARP_POINTS = config.getBoolean(ConfigItem.ALLOW_WARP_POINTS.key(), Configuration.CATEGORY_GENERAL, true, ConfigItem.ALLOW_WARP_POINTS.desc(), ConfigItem.ALLOW_WARP_POINTS.languageKey());
-        orderedKeys.add(ConfigItem.ALLOW_WARP_POINTS.key());
-        MAXIMUM_WARP_POINTS = config.getInt(ConfigItem.MAXIMUM_WARP_POINTS.key(), Configuration.CATEGORY_GENERAL, 10, 0, 100, ConfigItem.MAXIMUM_WARP_POINTS.desc(), ConfigItem.MAXIMUM_WARP_POINTS.languageKey());
-        orderedKeys.add(ConfigItem.MAXIMUM_WARP_POINTS.key());
-
-        config.setCategoryPropertyOrder(Configuration.CATEGORY_GENERAL, orderedKeys);
-
-        if (config.hasChanged()) {
-            config.save();
+        public Common(ForgeConfigSpec.Builder builder) {
+            builder.push("common");
+            ALLOW_WARP_POINTS = builder
+                .comment("Allow warp points")
+                .translation(Reference.MODID + ".config.common.allowWarpPoints")
+                .define("allowWarpPoints", true);
+            MAXIMUM_WARP_POINTS = builder
+                .comment("Maximum amount of warp points")
+                .translation(Reference.MODID + ".config.common.maximumWarpPoints")
+                .defineInRange("maximumWarpPoints", 10, 0, Integer.MAX_VALUE);
+            builder.pop();
         }
     }
 
-    public static class ConfigChangeHandler {
-        @SubscribeEvent(priority = EventPriority.NORMAL)
-        public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-            if (Reference.MOD_ID.equals(event.getModID())) {
-                config.save();
-                syncConfig();
-            }
-        }
+    private static void loadConfig(Path path) {
+        SimpleHomes.LOGGER.debug("Loading Simple Homes config...");
+
+        CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().autoreload().writingMode(WritingMode.REPLACE).build();
+        configData.load();
+        spec.setConfig(configData);
+    }
+
+    public static void register(final ModLoadingContext context) {
+        context.registerConfig(ModConfig.Type.COMMON, spec);
+        loadConfig(FMLPaths.CONFIGDIR.get().resolve(Reference.MODID + "-common.toml"));
     }
 }

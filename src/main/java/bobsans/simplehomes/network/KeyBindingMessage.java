@@ -1,44 +1,50 @@
 package bobsans.simplehomes.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.IThreadListener;
-import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
+import bobsans.simplehomes.SimpleHomes;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.minecraft.command.CommandSource;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fml.server.ServerLifecycleHooks;
 
-public class KeyBindingMessage implements IMessage {
+import java.util.function.Supplier;
+
+public class KeyBindingMessage {
     public static byte HOME_KEY_PRESSED = 1;
 
     protected byte data;
-
-    public KeyBindingMessage() {}
 
     public KeyBindingMessage(byte data) {
         this.data = data;
     }
 
-    public void fromBytes(ByteBuf buf) {
-        this.data = buf.readByte();
+    public static KeyBindingMessage read(PacketBuffer buffer) {
+        return new KeyBindingMessage(buffer.readByte());
     }
 
-    public void toBytes(ByteBuf buf) {
-        buf.writeByte(data);
+    public static void write(KeyBindingMessage message, PacketBuffer buffer) {
+        buffer.writeByte(message.data);
     }
 
-    public static class Handler implements IMessageHandler<KeyBindingMessage, IMessage> {
-        @Override
-        public IMessage onMessage(KeyBindingMessage message, MessageContext ctx) {
-            IThreadListener thread = ctx.side == Side.SERVER ? (WorldServer)ctx.getServerHandler().player.world : Minecraft.getMinecraft();
-
+    public static class Handler {
+        public static void onMessage(KeyBindingMessage message, Supplier<NetworkEvent.Context> context) {
             if (message.data == HOME_KEY_PRESSED) {
-                thread.addScheduledTask(() -> FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager().executeCommand(ctx.getServerHandler().player, "home"));
-            }
+                context.get().enqueueWork(() -> {
+                    CommandDispatcher<CommandSource> dispatcher = ServerLifecycleHooks.getCurrentServer().getCommandManager().getDispatcher();
+                    PlayerEntity player = context.get().getSender();
 
-            return null;
+                    if (player != null) {
+                        try {
+                            dispatcher.execute("home", player.getCommandSource());
+                        } catch (CommandSyntaxException e) {
+                            SimpleHomes.LOGGER.error(e.getMessage());
+                        }
+                    }
+                });
+            }
+            context.get().setPacketHandled(true);
         }
     }
 }

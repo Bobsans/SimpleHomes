@@ -1,19 +1,14 @@
 package bobsans.simplehomes.proxy;
 
-import bobsans.simplehomes.binding.Keys;
-import bobsans.simplehomes.config.Config;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import bobsans.simplehomes.Reference;
+import bobsans.simplehomes.gui.ConfigGUI;
+import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
-public class ClientProxy extends CommonProxy {
-    public void preInit(FMLPreInitializationEvent e) {
-        super.preInit(e);
-        Config.init(e.getSuggestedConfigurationFile());
-    }
-
-    public void init(FMLInitializationEvent e) {
-        super.init(e);
-        Keys.init();
+public class ClientProxy implements IProxy {
+    public void setup(final FMLCommonSetupEvent event) {
+        ModList.get().getModContainerById(Reference.MODID).ifPresent((consumer) -> consumer.registerExtensionPoint(ExtensionPoint.CONFIGGUIFACTORY, () -> (mc, parent) -> new ConfigGUI(parent)));
     }
 }
 

@@ -1,16 +1,22 @@
 package bobsans.simplehomes.network;
 
 import bobsans.simplehomes.Reference;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 public class NetworkHandler {
-    public static SimpleNetworkWrapper network;
+    public static SimpleChannel NETWORK;
 
     public static void init() {
-        network = NetworkRegistry.INSTANCE.newSimpleChannel(Reference.MOD_ID);
-        network.registerMessage(KeyBindingMessage.Handler.class, KeyBindingMessage.class, MessageType.HOME_KEY_PRESSED.ordinal(), Side.SERVER);
+        NETWORK = NetworkRegistry.ChannelBuilder
+            .named(new ResourceLocation(Reference.MODID, "networking"))
+            .clientAcceptedVersions((a) -> true)
+            .serverAcceptedVersions((a) -> true)
+            .networkProtocolVersion(() -> Reference.VERSION)
+            .simpleChannel();
+
+        NETWORK.registerMessage(MessageType.HOME_KEY_PRESSED.ordinal(), KeyBindingMessage.class, KeyBindingMessage::write, KeyBindingMessage::read, KeyBindingMessage.Handler::onMessage);
     }
 
     public enum MessageType {

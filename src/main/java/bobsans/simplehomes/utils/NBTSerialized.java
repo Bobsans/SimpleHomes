@@ -1,9 +1,9 @@
 package bobsans.simplehomes.utils;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 
 public interface NBTSerialized {
     String getNBTKey();
 
-    NBTTagCompound toNBT();
+    CompoundNBT toNBT();
 }

@@ -43,7 +43,7 @@ public class PlayerTeleporter {
         player.dimension = type;
         ServerWorld destWorld = player.server.getWorld(type);
         WorldInfo worldinfo = player.world.getWorldInfo();
-        player.connection.sendPacket(new SRespawnPacket(type, worldinfo.getGenerator(), player.interactionManager.getGameType()));
+        player.connection.sendPacket(new SRespawnPacket(type, WorldInfo.byHashing(worldinfo.getSeed()), worldinfo.getGenerator(), player.interactionManager.getGameType()));
         player.connection.sendPacket(new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
         PlayerList playerlist = player.server.getPlayerList();
         playerlist.updatePermissionLevel(player);
@@ -59,7 +59,7 @@ public class PlayerTeleporter {
 
         srcWorld.getProfiler().endSection();
         player.setWorld(destWorld);
-        destWorld.func_217447_b(player);
+        destWorld.addDuringCommandTeleport(player);
         player.connection.setPlayerLocation(pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, f1, f);
         player.interactionManager.setWorld(destWorld);
         player.connection.sendPacket(new SPlayerAbilitiesPacket(player.abilities));

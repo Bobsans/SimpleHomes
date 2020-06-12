@@ -19,9 +19,9 @@ public class WarpPoint implements NBTSerialized {
     public WarpPoint(PlayerEntity player, String name) {
         this.name = name;
         this.dimension = player.getEntityWorld().getDimension().getType();
-        this.x = player.posX;
-        this.y = player.posY;
-        this.z = player.posZ;
+        this.x = player.getPosX();
+        this.y = player.getPosY();
+        this.z = player.getPosZ();
         this.pitch = player.rotationPitch;
         this.yaw = player.rotationYaw;
     }

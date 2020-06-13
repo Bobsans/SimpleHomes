@@ -1,17 +1,13 @@
 package bobsans.simplehomes.config;
 
 import bobsans.simplehomes.Reference;
-import bobsans.simplehomes.SimpleHomes;
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
-import com.electronwill.nightconfig.core.io.WritingMode;
+import by.bobsans.boblib.config.ConfigBase;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.loading.FMLPaths;
 
-import java.nio.file.Path;
-
-public class Config {
+public class Config extends ConfigBase {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final Common COMMON = new Common(BUILDER);
     public static final ForgeConfigSpec spec = BUILDER.build();
@@ -34,16 +30,8 @@ public class Config {
         }
     }
 
-    private static void loadConfig(Path path) {
-        SimpleHomes.LOGGER.debug("Loading Simple Homes config...");
-
-        CommentedFileConfig configData = CommentedFileConfig.builder(path).sync().autosave().autoreload().writingMode(WritingMode.REPLACE).build();
-        configData.load();
-        spec.setConfig(configData);
-    }
-
     public static void register(final ModLoadingContext context) {
         context.registerConfig(ModConfig.Type.COMMON, spec);
-        loadConfig(FMLPaths.CONFIGDIR.get().resolve(Reference.MODID + "-common.toml"));
+        loadConfig(spec, FMLPaths.CONFIGDIR.get().resolve(Reference.MODID + "-common.toml"));
     }
 }

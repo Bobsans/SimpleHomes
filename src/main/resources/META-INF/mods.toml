@@ -1,26 +1,33 @@
 modLoader="javafml"
-loaderVersion="[31,)"
+loaderVersion="${forge_version_map}"
 
 [[mods]]
-    modId="simplehomes"
-    version="1.0.4"
-    displayName="Simple Homes"
-    updateJSONURL="https://minecraft.darkboy.ru/api/check-mod-updates/simplehomes.json"
-    displayURL="https://minecraft.darkboy.ru/mods/simplehomes"
-    credits="Simple: homes."
-    authors="Bobsans"
-    description='''Lost in a cave? /home will solve your problems.'''
+    modId="${mod_id}"
+    version="${mod_version}"
+    displayName="${mod_name}"
+    updateJSONURL="${mod_update_url}"
+    displayURL="${mod_url}"
+    credits="${mod_credits}"
+    authors="${mod_author}"
+    description='''${mod_description}'''
 
     [[dependencies.simplehomes]]
         modId="forge"
         mandatory=true
-        versionRange="[31,)"
+        versionRange="${forge_version_map}"
         ordering="NONE"
         side="BOTH"
 
     [[dependencies.simplehomes]]
         modId="minecraft"
         mandatory=true
-        versionRange="[1.15.2]"
+        versionRange="${minecraft_version_map}"
         ordering="NONE"
+        side="BOTH"
+
+    [[dependencies.simplehomes]]
+        modId="boblib"
+        mandatory=true
+        versionRange="${boblib_version_map}"
+        ordering="AFTER"
         side="BOTH"

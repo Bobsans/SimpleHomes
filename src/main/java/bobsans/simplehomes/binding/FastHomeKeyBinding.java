@@ -2,7 +2,7 @@ package bobsans.simplehomes.binding;
 
 import bobsans.simplehomes.Reference;
 import bobsans.simplehomes.network.KeyBindingMessage;
-import by.bobsans.boblib.network.NetworkingManager;
+import bobsans.simplehomes.network.NetworkingManager;
 import net.minecraft.client.settings.KeyBinding;
 import org.lwjgl.glfw.GLFW;
 

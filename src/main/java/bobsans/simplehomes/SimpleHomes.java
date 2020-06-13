@@ -4,10 +4,11 @@ import bobsans.simplehomes.command.CommandBase;
 import bobsans.simplehomes.command.CommandHome;
 import bobsans.simplehomes.command.CommandWarp;
 import bobsans.simplehomes.config.Config;
-import bobsans.simplehomes.network.NetworkHandler;
+import bobsans.simplehomes.network.KeyBindingMessage;
 import bobsans.simplehomes.proxy.ClientProxy;
 import bobsans.simplehomes.proxy.IProxy;
 import bobsans.simplehomes.proxy.ServerProxy;
+import by.bobsans.boblib.network.NetworkingManager;
 import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandSource;
 import net.minecraftforge.common.MinecraftForge;
@@ -33,9 +34,11 @@ public class SimpleHomes {
     }
 
     public void setup(final FMLCommonSetupEvent event) {
-        NetworkHandler.init();
+        NetworkingManager.registerMessage(KeyBindingMessage.class, KeyBindingMessage::write, KeyBindingMessage::read, KeyBindingMessage.Handler::onMessage);
+
         Config.register(ModLoadingContext.get());
         CommandBase.registerArguments();
+
         proxy.setup(event);
     }
 

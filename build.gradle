@@ -11,6 +11,17 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 
+repositories {
+    maven {
+        name = "GitHubPackages"
+        url = uri('https://maven.pkg.github.com/Bobsans/BobLib')
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("USERNAME")
+            password = project.findProperty("gpr.key") ?: System.getenv("TOKEN")
+        }
+    }
+}
+
 version = mod_version
 group = group_name
 archivesBaseName = "[${minecraft_version}] ${mod_name}"
@@ -20,50 +31,32 @@ minecraft {
 
     runs {
         client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'info'
-
-            mods {
-                simplehomes {
-                    source sourceSets.main
-                }
-            }
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            properties 'forge.logging.console.level': 'info'
+            workingDirectory project.file('run').canonicalPath
+            source sourceSets.main
         }
 
         server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'info'
-
-            mods {
-                simplehomes {
-                    source sourceSets.main
-                }
-            }
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            properties 'forge.logging.console.level': 'info'
+            workingDirectory project.file('run').canonicalPath
+            source sourceSets.main
         }
 
         data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-
-            args '--mod', 'simplehomes', '--all', '--output', file('src/generated/resources/')
-
-            mods {
-                simplehomes {
-                    source sourceSets.main
-                }
-            }
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            properties 'forge.logging.console.level': 'debug'
+            workingDirectory project.file('run').canonicalPath
+            args '--mod', 'simplehomes', '--all', '--output', file('src/generated/resources/'), '--existing', sourceSets.main.resources.srcDirs[0]
+            source sourceSets.main
         }
     }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compile fg.deobf("by.bobsans.boblib:BobLib:${boblib_version}")
 }
 
 jar {

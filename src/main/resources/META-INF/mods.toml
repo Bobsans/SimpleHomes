@@ -3,7 +3,7 @@ loaderVersion="[28,)"
 
 [[mods]]
     modId="simplehomes"
-    version="1.0.4"
+    version="1.0.5"
     displayName="Simple Homes"
     updateJSONURL="https://minecraft.darkboy.ru/api/check-mod-updates/simplehomes.json"
     displayURL="https://minecraft.darkboy.ru/mods/simplehomes"
@@ -22,5 +22,12 @@ loaderVersion="[28,)"
         modId="minecraft"
         mandatory=true
         versionRange="[1.14.4]"
+        ordering="NONE"
+        side="BOTH"
+
+    [[dependencies.simplehomes]]
+        modId="boblib"
+        mandatory=true
+        versionRange="[0.1,)"
         ordering="NONE"
         side="BOTH"

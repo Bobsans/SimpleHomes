@@ -1,6 +1,6 @@
 {
-    "pack": {
-        "pack_format": 4,
-        "description": "SimpleHomes"
-    }
+  "pack": {
+    "pack_format": 6,
+    "description": "SimpleHomes"
+  }
 }

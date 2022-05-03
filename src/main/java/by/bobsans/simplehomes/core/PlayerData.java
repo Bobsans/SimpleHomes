@@ -1,10 +1,10 @@
 package by.bobsans.simplehomes.core;
 
 import by.bobsans.simplehomes.utils.NBTSerialized;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,32 +17,32 @@ public class PlayerData implements NBTSerialized {
     public WarpPoint home = null;
     public Map<String, WarpPoint> warps = new HashMap<>();
 
-    public PlayerData(PlayerEntity player) {
+    public PlayerData(Player player) {
         this.setPlayer(player);
     }
 
-    public PlayerData(CompoundNBT tag) {
+    public PlayerData(CompoundTag tag) {
         this.updateFromNBT(tag);
     }
 
-    public void setPlayer(PlayerEntity player) {
+    public void setPlayer(Player player) {
         uuid = player.getStringUUID();
         name = player.getName().getString();
     }
 
-    public void updateFromNBT(CompoundNBT tag) {
+    public void updateFromNBT(CompoundTag tag) {
         uuid = tag.getString("uuid");
         name = tag.getString("name");
 
-        CompoundNBT homeTag = tag.getCompound("home");
+        CompoundTag homeTag = tag.getCompound("home");
         if (homeTag.size() != 0) {
             home = new WarpPoint(homeTag);
         }
 
-        INBT warpsList = tag.get("warps");
-        if (warpsList instanceof ListNBT) {
-            for (INBT warpTag : (ListNBT) warpsList) {
-                WarpPoint warp = new WarpPoint((CompoundNBT) warpTag);
+        Tag warpsList = tag.get("warps");
+        if (warpsList instanceof ListTag) {
+            for (Tag warpTag : (ListTag) warpsList) {
+                WarpPoint warp = new WarpPoint((CompoundTag) warpTag);
                 warps.put(warp.name, warp);
             }
         }
@@ -64,8 +64,8 @@ public class PlayerData implements NBTSerialized {
         return uuid;
     }
 
-    public CompoundNBT toNBT() {
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag toNBT() {
+        CompoundTag tag = new CompoundTag();
         tag.putString("uuid", uuid);
         tag.putString("name", name);
 
@@ -74,7 +74,7 @@ public class PlayerData implements NBTSerialized {
         }
 
         if (!warps.isEmpty()) {
-            tag.put("warps", this.warps.values().stream().map(WarpPoint::toNBT).collect(Collectors.toCollection(ListNBT::new)));
+            tag.put("warps", this.warps.values().stream().map(WarpPoint::toNBT).collect(Collectors.toCollection(ListTag::new)));
         }
 
         return tag;

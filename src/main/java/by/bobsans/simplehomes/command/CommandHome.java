@@ -10,21 +10,21 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.commands.CommandRuntimeException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.server.ServerLifecycleHooks;
 
 public class CommandHome extends CommandBase {
     private static final String name = "home";
 
-    public static void register(CommandDispatcher<CommandSource> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(build());
     }
 
-    public static LiteralArgumentBuilder<CommandSource> build() {
+    public static LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands
             .literal(name)
             .executes((context) -> goHome(context, context.getSource().getPlayerOrException()))
@@ -42,20 +42,20 @@ public class CommandHome extends CommandBase {
                     ))));
     }
 
-    private static int setHome(CommandContext<CommandSource> context, PlayerEntity player) throws CommandException {
+    private static int setHome(CommandContext<CommandSourceStack> context, Player player) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
         playerData.setHome(new WarpPoint(player, "home"));
         manager.setDirty();
 
-        sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.setHome"));
+        sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.setHome"));
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int meetPlayerHome(CommandContext<CommandSource> context, PlayerEntity player, String targetUserName) throws CommandException {
-        PlayerEntity target = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(targetUserName);
+    private static int meetPlayerHome(CommandContext<CommandSourceStack> context, Player player, String targetUserName) {
+        Player target = ServerLifecycleHooks.getCurrentServer().getPlayerList().getPlayerByName(targetUserName);
 
         if (target != null) {
             PlayerDataManager manager = PlayerDataManager.instance();
@@ -63,26 +63,26 @@ public class CommandHome extends CommandBase {
 
             if (targetPlayerData.home != null) {
                 PlayerTeleporter.teleport(player, targetPlayerData.home);
-                sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.meet", targetPlayerData.name));
+                sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.meet", targetPlayerData.name));
             } else {
-                throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.meet.hasNoHome", targetPlayerData.name));
+                throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.meet.hasNoHome", targetPlayerData.name));
             }
         } else {
-            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.meet.playerNotFound", targetUserName));
+            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.meet.playerNotFound", targetUserName));
         }
 
         return Command.SINGLE_SUCCESS;
     }
 
-    private static int goHome(CommandContext<CommandSource> context, PlayerEntity player) throws CommandException {
+    private static int goHome(CommandContext<CommandSourceStack> context, Player player) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
         if (playerData.home != null) {
             PlayerTeleporter.teleport(player, playerData.home);
-            sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.goHome"));
+            sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.goHome"));
         } else {
-            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.goHome.notSet"));
+            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.goHome.notSet"));
         }
 
         return Command.SINGLE_SUCCESS;

@@ -3,19 +3,19 @@ package by.bobsans.simplehomes.command;
 import by.bobsans.simplehomes.Reference;
 import by.bobsans.simplehomes.command.arguments.PlayerNameWithHomeArgument;
 import by.bobsans.simplehomes.command.arguments.WarpPointNameArgument;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.arguments.ArgumentSerializer;
-import net.minecraft.command.arguments.ArgumentTypes;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.synchronization.ArgumentTypes;
+import net.minecraft.commands.synchronization.EmptyArgumentSerializer;
+import net.minecraft.network.chat.Component;
 
 public class CommandBase {
-    static void sendFeedback(CommandSource source, ITextComponent message) {
-        source.sendSuccess(message.copy().withStyle(TextFormatting.DARK_AQUA), true);
+    static void sendFeedback(CommandSourceStack source, Component message) {
+        source.sendSuccess(message.copy().withStyle(ChatFormatting.DARK_AQUA), true);
     }
 
     public static void registerArguments() {
-        ArgumentTypes.register(Reference.MODID + ":player_data", PlayerNameWithHomeArgument.class, new ArgumentSerializer<>(PlayerNameWithHomeArgument::userName));
-        ArgumentTypes.register(Reference.MODID + ":warp_point", WarpPointNameArgument.class, new ArgumentSerializer<>(WarpPointNameArgument::name));
+        ArgumentTypes.register(Reference.MODID + ":player_data", PlayerNameWithHomeArgument.class, new EmptyArgumentSerializer<>(PlayerNameWithHomeArgument::userName));
+        ArgumentTypes.register(Reference.MODID + ":warp_point", WarpPointNameArgument.class, new EmptyArgumentSerializer<>(WarpPointNameArgument::name));
     }
 }

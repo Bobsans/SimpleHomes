@@ -12,20 +12,20 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.Commands;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.commands.CommandRuntimeException;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.entity.player.Player;
 
 
 public class CommandWarp extends CommandBase {
-    public static void register(CommandDispatcher<CommandSource> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(build());
     }
 
-    static LiteralArgumentBuilder<CommandSource> build() {
+    static LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands.literal("warp")
             .requires((source) -> Config.COMMON.ALLOW_WARP_POINTS.get())
             .then(Commands
@@ -46,61 +46,61 @@ public class CommandWarp extends CommandBase {
                 .executes((context) -> warp(context, context.getSource().getPlayerOrException(), WarpPointNameArgument.getName(context, "name"))));
     }
 
-    public static int setWarp(CommandContext<CommandSource> context, PlayerEntity player, String name) throws CommandException {
+    public static int setWarp(CommandContext<CommandSourceStack> context, Player player, String name) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
         if (playerData.warps.size() >= Config.COMMON.MAXIMUM_WARP_POINTS.get()) {
-            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.setWarp.reachedMaximum"));
+            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.setWarp.reachedMaximum"));
         }
 
         playerData.addWarp(new WarpPoint(player, name));
         manager.setDirty();
 
-        sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.setWarp", name));
+        sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.setWarp", name));
 
         return Command.SINGLE_SUCCESS;
     }
 
-    public static int deleteWarp(CommandContext<CommandSource> context, PlayerEntity player, String warpName) throws CommandException {
+    public static int deleteWarp(CommandContext<CommandSourceStack> context, Player player, String warpName) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
         if (playerData.warps.containsKey(warpName)) {
             manager.getOrCreate(player).warps.remove(warpName);
             manager.setDirty();
-            sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.deleteWarp", warpName));
+            sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.deleteWarp", warpName));
         } else {
-            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
+            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
         }
 
         return Command.SINGLE_SUCCESS;
     }
 
-    public static int warpsList(CommandContext<CommandSource> context, PlayerEntity player) throws CommandException {
+    public static int warpsList(CommandContext<CommandSourceStack> context, Player player) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
         if (playerData.warps.size() > 0) {
             for (WarpPoint warp : playerData.warps.values()) {
                 String coords = String.format("%.2f", warp.x) + ", " + String.format("%.2f", warp.y) + ", " + String.format("%.2f", warp.z);
-                sendFeedback(context.getSource(), new StringTextComponent(warp.name + ": " + coords));
+                sendFeedback(context.getSource(), new TextComponent(warp.name + ": " + coords));
             }
         } else {
-            sendFeedback(context.getSource(), new TranslationTextComponent(Reference.MODID + ".commands.warpsList.empty"));
+            sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.warpsList.empty"));
         }
 
         return Command.SINGLE_SUCCESS;
     }
 
-    public static int warp(CommandContext<CommandSource> context, PlayerEntity player, String warpName) throws CommandException {
+    public static int warp(CommandContext<CommandSourceStack> context, Player player, String warpName) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
         if (playerData.warps.containsKey(warpName)) {
             PlayerTeleporter.teleport(player, playerData.warps.get(warpName));
         } else {
-            throw new CommandException(new TranslationTextComponent(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
+            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
         }
 
         return Command.SINGLE_SUCCESS;

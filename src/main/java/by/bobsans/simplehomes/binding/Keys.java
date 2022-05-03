@@ -1,10 +1,10 @@
 package by.bobsans.simplehomes.binding;
 
 import by.bobsans.simplehomes.Reference;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 
 import static net.minecraftforge.api.distmarker.Dist.CLIENT;

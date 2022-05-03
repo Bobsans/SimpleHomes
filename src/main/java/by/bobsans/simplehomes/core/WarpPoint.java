@@ -1,25 +1,25 @@
 package by.bobsans.simplehomes.core;
 
 import by.bobsans.simplehomes.utils.NBTSerialized;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.World;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 
 public class WarpPoint implements NBTSerialized {
     public String name;
-    public RegistryKey<World> world;
+    public ResourceKey<Level> world;
     public double x;
     public double y;
     public double z;
-    public Vector2f rotation;
+    public Vec2 rotation;
 
-    private WarpPoint() { }
+    private WarpPoint() {}
 
-    public WarpPoint(PlayerEntity player, String name) {
+    public WarpPoint(Player player, String name) {
         this.name = name;
         this.world = player.getCommandSenderWorld().dimension();
         this.x = player.getX();
@@ -28,21 +28,21 @@ public class WarpPoint implements NBTSerialized {
         this.rotation = player.getRotationVector();
     }
 
-    public WarpPoint(CompoundNBT tag) {
+    public WarpPoint(CompoundTag tag) {
         this.name = tag.getString("name");
-        this.world = RegistryKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString("world")));
+        this.world = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString("world")));
         this.x = tag.getDouble("x");
         this.y = tag.getDouble("y");
         this.z = tag.getDouble("z");
-        this.rotation = new Vector2f(tag.getFloat("rotx"), tag.getFloat("roty"));
+        this.rotation = new Vec2(tag.getFloat("rotx"), tag.getFloat("roty"));
     }
 
     public String getNBTKey() {
         return name;
     }
 
-    public CompoundNBT toNBT() {
-        CompoundNBT tag = new CompoundNBT();
+    public CompoundTag toNBT() {
+        CompoundTag tag = new CompoundTag();
         tag.putString("name", name);
         tag.putString("world", world.location().toString());
         tag.putDouble("x", x);

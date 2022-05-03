@@ -8,9 +8,9 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import net.minecraft.command.CommandSource;
-import net.minecraft.command.ISuggestionProvider;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,7 +23,7 @@ import java.util.stream.Stream;
 public class PlayerNameWithHomeArgument implements ArgumentType<String> {
     private static final Collection<String> EXAMPLES = Arrays.asList("notch", "Bobsans");
 
-    private Collection<String> existingWithoutCurrent(PlayerEntity player) {
+    private Collection<String> existingWithoutCurrent(Player player) {
         if (player != null) {
             Stream<PlayerData> stream = PlayerDataManager.instance().getPlayerDataList().stream().filter((data) -> !data.name.equals(player.getName().toString()));
             return stream.map((warp) -> warp.name).collect(Collectors.toList());
@@ -37,15 +37,14 @@ public class PlayerNameWithHomeArgument implements ArgumentType<String> {
     }
 
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        if (context.getSource() instanceof CommandSource) {
+        if (context.getSource() instanceof CommandSourceStack) {
             try {
-                return ISuggestionProvider.suggest(existingWithoutCurrent(((CommandSource) context.getSource()).getPlayerOrException()), builder);
+                return SharedSuggestionProvider.suggest(existingWithoutCurrent(((CommandSourceStack) context.getSource()).getPlayerOrException()), builder);
             } catch (CommandSyntaxException e) {
                 return Suggestions.empty();
             }
-        } else if (context.getSource() instanceof ISuggestionProvider) {
-            ISuggestionProvider isuggestionprovider = (ISuggestionProvider) context.getSource();
-            return isuggestionprovider.customSuggestion((CommandContext<ISuggestionProvider>) context, builder);
+        } else if (context.getSource() instanceof SharedSuggestionProvider) {
+            return ((SharedSuggestionProvider) context.getSource()).customSuggestion(context);
         } else {
             return Suggestions.empty();
         }
@@ -59,7 +58,7 @@ public class PlayerNameWithHomeArgument implements ArgumentType<String> {
         return new PlayerNameWithHomeArgument();
     }
 
-    public static String getUserName(CommandContext<CommandSource> context, String name) {
+    public static String getUserName(CommandContext<CommandSourceStack> context, String name) {
         return context.getArgument(name, String.class);
     }
 }

@@ -1,61 +1,66 @@
 package by.bobsans.simplehomes.core;
 
 import by.bobsans.simplehomes.Reference;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.world.storage.DimensionSavedDataManager;
-import net.minecraft.world.storage.WorldSavedData;
-import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.fml.server.ServerLifecycleHooks;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraftforge.server.ServerLifecycleHooks;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 
-public class PlayerDataManager extends WorldSavedData {
+public class PlayerDataManager extends SavedData {
     private static final String DATA_NAME = Reference.MODID;
     private final Map<String, PlayerData> data = new HashMap<>();
     private static final PlayerDataManager clientInstance = new PlayerDataManager();
 
     public PlayerDataManager() {
-        super(DATA_NAME);
+        super();
     }
 
     public static PlayerDataManager instance() {
         MinecraftServer server = ServerLifecycleHooks.getCurrentServer();
         if (server != null) {
-            DimensionSavedDataManager storage = server.overworld().getDataStorage();
-            return storage.computeIfAbsent(PlayerDataManager::new, DATA_NAME);
+            DimensionDataStorage storage = server.overworld().getDataStorage();
+            return storage.computeIfAbsent(PlayerDataManager::load, PlayerDataManager::new, DATA_NAME);
         }
 
         return clientInstance;
     }
 
-    public void load(CompoundNBT nbt) {
-        ListNBT list = nbt.getList("data", Constants.NBT.TAG_COMPOUND);
+    public static PlayerDataManager load(CompoundTag tag) {
+        PlayerDataManager instance = new PlayerDataManager();
+
+        ListTag list = tag.getList("data", Tag.TAG_COMPOUND);
         list.forEach((item) -> {
-            if (item instanceof CompoundNBT) {
-                PlayerData playerData = new PlayerData((CompoundNBT) item);
-                data.put(playerData.getNBTKey(), playerData);
+            if (item instanceof CompoundTag) {
+                PlayerData playerData = new PlayerData((CompoundTag) item);
+                instance.data.put(playerData.getNBTKey(), playerData);
             }
         });
+
+        return instance;
     }
 
-    public CompoundNBT save(CompoundNBT compound) {
-        ListNBT listNBT = new ListNBT();
+    public @NotNull CompoundTag save(CompoundTag tag) {
+        ListTag listNBT = new ListTag();
         data.forEach((key, playerData) -> listNBT.add(playerData.toNBT()));
-        compound.put("data", listNBT);
-        return compound;
+        tag.put("data", listNBT);
+        return tag;
     }
 
     public Collection<PlayerData> getPlayerDataList() {
         return data.values();
     }
 
-    public PlayerData getOrCreate(PlayerEntity player) {
+    public PlayerData getOrCreate(Player player) {
         if (data.containsKey(player.getStringUUID())) {
             return data.get(player.getStringUUID());
         }

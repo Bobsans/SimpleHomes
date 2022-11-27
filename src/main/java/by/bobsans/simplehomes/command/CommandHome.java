@@ -1,7 +1,7 @@
 package by.bobsans.simplehomes.command;
 
 import by.bobsans.simplehomes.Reference;
-import by.bobsans.simplehomes.command.arguments.PlayerNameWithHomeArgument;
+import by.bobsans.simplehomes.command.arguments.PlayerWithHomeArgument;
 import by.bobsans.simplehomes.core.PlayerData;
 import by.bobsans.simplehomes.core.PlayerDataManager;
 import by.bobsans.simplehomes.core.WarpPoint;
@@ -13,11 +13,11 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandRuntimeException;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.server.ServerLifecycleHooks;
 
-public class CommandHome extends CommandBase {
+public class CommandHome extends BaseCommand {
     private static final String name = "home";
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -34,11 +34,11 @@ public class CommandHome extends CommandBase {
             .then(Commands
                 .literal("meet")
                 .then(Commands
-                    .argument("target", PlayerNameWithHomeArgument.userName())
+                    .argument("target", PlayerWithHomeArgument.userName())
                     .executes((context) -> meetPlayerHome(
                         context,
                         context.getSource().getPlayerOrException(),
-                        PlayerNameWithHomeArgument.getUserName(context, "target")
+                        PlayerWithHomeArgument.getUserName(context, "target")
                     ))));
     }
 
@@ -49,7 +49,7 @@ public class CommandHome extends CommandBase {
         playerData.setHome(new WarpPoint(player, "home"));
         manager.setDirty();
 
-        sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.setHome"));
+        sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.setHome"));
 
         return Command.SINGLE_SUCCESS;
     }
@@ -63,12 +63,12 @@ public class CommandHome extends CommandBase {
 
             if (targetPlayerData.home != null) {
                 PlayerTeleporter.teleport(player, targetPlayerData.home);
-                sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.meet", targetPlayerData.name));
+                sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.meet", targetPlayerData.name));
             } else {
-                throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.meet.hasNoHome", targetPlayerData.name));
+                throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.meet.hasNoHome", targetPlayerData.name));
             }
         } else {
-            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.meet.playerNotFound", targetUserName));
+            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.meet.playerNotFound", targetUserName));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -80,9 +80,9 @@ public class CommandHome extends CommandBase {
 
         if (playerData.home != null) {
             PlayerTeleporter.teleport(player, playerData.home);
-            sendFeedback(context.getSource(), new TranslatableComponent(Reference.MODID + ".commands.goHome"));
+            sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.goHome"));
         } else {
-            throw new CommandRuntimeException(new TranslatableComponent(Reference.MODID + ".commands.goHome.notSet"));
+            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.goHome.notSet"));
         }
 
         return Command.SINGLE_SUCCESS;

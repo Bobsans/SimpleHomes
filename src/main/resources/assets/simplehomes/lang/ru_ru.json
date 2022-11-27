@@ -20,7 +20,7 @@
     "simplehomes.commands.goHome": "Добро пожаловать домой!",
     "simplehomes.commands.goHome.notSet": "Сначала установите точку дома! §5[/home set]§r",
     "simplehomes.commands.setWarp": "Варп-точка \"%s\" установлена",
-    "simplehomes.commands.setWarp.reachedMaximum": "Вы достигли лимита варп-точек.",
+    "simplehomes.commands.setWarp.maximumReached": "Вы достигли лимита варп-точек.",
     "simplehomes.commands.deleteWarp": "Варп-точка \"%s\" удалена.",
-    "simplehomes.commands.warpsList.empty": "У вас нет установленных варп-точек."
+    "simplehomes.commands.warpList.empty": "У вас нет установленных варп-точек."
 }

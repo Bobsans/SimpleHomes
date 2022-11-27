@@ -1,5 +1,6 @@
 package by.bobsans.simplehomes.command.arguments;
 
+import by.bobsans.simplehomes.core.PlayerData;
 import by.bobsans.simplehomes.core.PlayerDataManager;
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
@@ -11,17 +12,24 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.world.entity.player.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
-public class WarpPointNameArgument implements ArgumentType<String> {
-    private static final Collection<String> EXAMPLES = Arrays.asList("carry", "village");
+public class PlayerWithHomeArgument implements ArgumentType<String> {
+    private static final Collection<String> EXAMPLES = Arrays.asList("notch", "Bobsans");
 
-    private Collection<String> userWarpPoints(Player player) {
-        return PlayerDataManager.instance().getOrCreate(player).warps.values().stream().map((warp) -> warp.name).collect(Collectors.toList());
+    private Collection<String> existingWithoutCurrent(Player player) {
+        if (player != null) {
+            Stream<PlayerData> stream = PlayerDataManager.instance().getPlayerDataList().stream().filter((data) -> !data.name.equals(player.getName().toString()));
+            return stream.map((warp) -> warp.name).collect(Collectors.toList());
+        } else {
+            return new ArrayList<>();
+        }
     }
 
     public String parse(StringReader reader) throws CommandSyntaxException {
@@ -31,7 +39,7 @@ public class WarpPointNameArgument implements ArgumentType<String> {
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
         if (context.getSource() instanceof CommandSourceStack) {
             try {
-                return SharedSuggestionProvider.suggest(userWarpPoints(((CommandSourceStack) context.getSource()).getPlayerOrException()), builder);
+                return SharedSuggestionProvider.suggest(existingWithoutCurrent(((CommandSourceStack) context.getSource()).getPlayerOrException()), builder);
             } catch (CommandSyntaxException e) {
                 return Suggestions.empty();
             }
@@ -46,11 +54,11 @@ public class WarpPointNameArgument implements ArgumentType<String> {
         return EXAMPLES;
     }
 
-    public static WarpPointNameArgument name() {
-        return new WarpPointNameArgument();
+    public static PlayerWithHomeArgument userName() {
+        return new PlayerWithHomeArgument();
     }
 
-    public static String getName(CommandContext<CommandSourceStack> context, String name) {
+    public static String getUserName(CommandContext<CommandSourceStack> context, String name) {
         return context.getArgument(name, String.class);
     }
 }

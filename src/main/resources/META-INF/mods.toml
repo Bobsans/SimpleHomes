@@ -1,10 +1,10 @@
 modLoader = "javafml"
-loaderVersion = "[40,)"
+loaderVersion = "[43,)"
 license = "All rights reserved"
 
 [[mods]]
     modId = "simplehomes"
-    version = "1.2.0"
+    version = "1.2.1"
     displayName = "SimpleHomes"
     updateJSONURL = "https://minecraft.darkboy.ru/api/check-mod-updates/simplehomes.json"
     displayURL = "https://minecraft.darkboy.ru/mods/simplehomes"
@@ -15,20 +15,20 @@ license = "All rights reserved"
     [[dependencies.simplehomes]]
         modId = "forge"
         mandatory = true
-        versionRange = "[40,)"
+        versionRange = "[43,)"
         ordering = "NONE"
         side = "BOTH"
 
     [[dependencies.simplehomes]]
         modId = "minecraft"
         mandatory = true
-        versionRange = "[1.18.2,1.19)"
+        versionRange = "[1.19.2,1.20)"
         ordering = "NONE"
         side = "BOTH"
 
     [[dependencies.simplehomes]]
         modId = "boblib"
         mandatory = true
-        versionRange = "[0.3.0,)"
+        versionRange = "[0.3.1,)"
         ordering = "NONE"
         side = "BOTH"

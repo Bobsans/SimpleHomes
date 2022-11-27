@@ -39,9 +39,9 @@ public class PlayerData implements NBTSerialized {
             home = new WarpPoint(homeTag);
         }
 
-        Tag warpsList = tag.get("warps");
-        if (warpsList instanceof ListTag) {
-            for (Tag warpTag : (ListTag) warpsList) {
+        Tag warpList = tag.get("warps");
+        if (warpList instanceof ListTag) {
+            for (Tag warpTag : (ListTag) warpList) {
                 WarpPoint warp = new WarpPoint((CompoundTag) warpTag);
                 warps.put(warp.name, warp);
             }

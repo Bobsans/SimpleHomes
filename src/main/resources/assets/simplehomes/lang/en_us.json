@@ -20,7 +20,7 @@
   "simplehomes.commands.goHome": "Welcome home!",
   "simplehomes.commands.goHome.notSet": "Set a home first! §5[/home set]§r",
   "simplehomes.commands.setWarp": "Warp \"%s\" set",
-  "simplehomes.commands.setWarp.reachedMaximum": "You have already reached maximum warp points.",
+  "simplehomes.commands.setWarp.maximumReached": "You have already reached maximum warp points.",
   "simplehomes.commands.deleteWarp": "Warp \"%s\" deleted.",
-  "simplehomes.commands.warpsList.empty": "You do not have waprs."
+  "simplehomes.commands.warpList.empty": "You do not have waprs."
 }

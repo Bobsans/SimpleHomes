@@ -22,5 +22,5 @@
   "simplehomes.commands.setWarp": "Warp \"%s\" set",
   "simplehomes.commands.setWarp.maximumReached": "You have already reached maximum warp points.",
   "simplehomes.commands.deleteWarp": "Warp \"%s\" deleted.",
-  "simplehomes.commands.warpList.empty": "You do not have waprs."
+  "simplehomes.commands.warpList.empty": "You do not have warps."
 }

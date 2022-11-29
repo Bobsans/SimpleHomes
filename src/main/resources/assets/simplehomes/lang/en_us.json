@@ -5,10 +5,10 @@
 
   "simplehomes.config.title": "Simple Homes config",
 
-  "simplehomes.config.common.allowWarpPoints": "Allow warp points",
-  "simplehomes.config.common.allowWarpPoints.desc": "Allow warp points setting.",
-  "simplehomes.config.common.maximumWarpPoints": "Maximim warp points",
-  "simplehomes.config.common.maximumWarpPoints.desc": "Maximim warp points per user.",
+  "simplehomes.config.general.allowWarpPoints": "Allow warp points",
+  "simplehomes.config.general.allowWarpPoints.desc": "Allow warp points setting.",
+  "simplehomes.config.general.maximumWarpPoints": "Maximim warp points",
+  "simplehomes.config.general.maximumWarpPoints.desc": "Maximim warp points per user.",
 
   "simplehomes.commands.argument.warp.doesNotExists": "Warp point named \"%s\" does not exist",
   "simplehomes.commands.argument.playerData.doesNotExists": "Player \"%s\" no have home",

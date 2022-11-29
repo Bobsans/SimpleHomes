@@ -1,8 +1,8 @@
 package by.bobsans.simplehomes.command;
 
+import by.bobsans.simplehomes.Config;
 import by.bobsans.simplehomes.Reference;
 import by.bobsans.simplehomes.command.arguments.WarpPointArgument;
-import by.bobsans.simplehomes.config.Config;
 import by.bobsans.simplehomes.core.PlayerData;
 import by.bobsans.simplehomes.core.PlayerDataManager;
 import by.bobsans.simplehomes.core.WarpPoint;
@@ -26,37 +26,37 @@ public class CommandWarp extends BaseCommand {
 
     static LiteralArgumentBuilder<CommandSourceStack> build() {
         return Commands.literal("warp")
-            .requires((source) -> Config.COMMON.ALLOW_WARP_POINTS.get())
+            .requires(source -> Config.Common.ALLOW_WARP_POINTS.get())
             .then(Commands
                 .literal("set")
                 .then(Commands
                     .argument("name", StringArgumentType.word())
-                    .executes((context) -> setWarp(context, context.getSource().getPlayerOrException(), StringArgumentType.getString(context, "name")))))
+                    .executes(context -> setWarp(context, context.getSource().getPlayerOrException(), StringArgumentType.getString(context, "name")))))
             .then(Commands
                 .literal("delete")
                 .then(Commands
                     .argument("name", WarpPointArgument.warpPoint())
-                    .executes((context) -> deleteWarp(context, context.getSource().getPlayerOrException(), WarpPointArgument.getName(context, "name")))))
+                    .executes(context -> deleteWarp(context, context.getSource().getPlayerOrException(), WarpPointArgument.getName(context, "name")))))
             .then(Commands
                 .literal("list")
-                .executes((context) -> warpList(context, context.getSource().getPlayerOrException())))
+                .executes(context -> warpList(context, context.getSource().getPlayerOrException())))
             .then(Commands
                 .argument("name", WarpPointArgument.warpPoint())
-                .executes((context) -> warp(context, context.getSource().getPlayerOrException(), WarpPointArgument.getName(context, "name"))));
+                .executes(context -> warp(context, context.getSource().getPlayerOrException(), WarpPointArgument.getName(context, "name"))));
     }
 
     public static int setWarp(CommandContext<CommandSourceStack> context, Player player, String name) {
         PlayerDataManager manager = PlayerDataManager.instance();
         PlayerData playerData = manager.getOrCreate(player);
 
-        if (playerData.warps.size() >= Config.COMMON.MAXIMUM_WARP_POINTS.get()) {
-            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.setWarp.maximumReached"));
+        if (playerData.warps.size() >= Config.Common.MAXIMUM_WARP_POINTS.get()) {
+            throw new CommandRuntimeException(Component.translatable(Reference.MOD_ID + ".commands.setWarp.maximumReached"));
         }
 
         playerData.addWarp(new WarpPoint(player, name));
         manager.setDirty();
 
-        sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.setWarp", name));
+        sendFeedback(context.getSource(), Component.translatable(Reference.MOD_ID + ".commands.setWarp", name));
 
         return Command.SINGLE_SUCCESS;
     }
@@ -68,9 +68,9 @@ public class CommandWarp extends BaseCommand {
         if (playerData.warps.containsKey(warpName)) {
             manager.getOrCreate(player).warps.remove(warpName);
             manager.setDirty();
-            sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.deleteWarp", warpName));
+            sendFeedback(context.getSource(), Component.translatable(Reference.MOD_ID + ".commands.deleteWarp", warpName));
         } else {
-            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
+            throw new CommandRuntimeException(Component.translatable(Reference.MOD_ID + ".commands.argument.warp.doesNotExists", warpName));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -86,7 +86,7 @@ public class CommandWarp extends BaseCommand {
                 sendFeedback(context.getSource(), Component.literal(warp.name + ": " + coords));
             }
         } else {
-            sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.warpList.empty"));
+            sendFeedback(context.getSource(), Component.translatable(Reference.MOD_ID + ".commands.warpList.empty"));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -99,7 +99,7 @@ public class CommandWarp extends BaseCommand {
         if (playerData.warps.containsKey(warpName)) {
             PlayerTeleporter.teleport(player, playerData.warps.get(warpName));
         } else {
-            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.argument.warp.doesNotExists", warpName));
+            throw new CommandRuntimeException(Component.translatable(Reference.MOD_ID + ".commands.argument.warp.doesNotExists", warpName));
         }
 
         return Command.SINGLE_SUCCESS;

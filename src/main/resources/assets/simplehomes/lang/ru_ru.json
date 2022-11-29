@@ -5,10 +5,10 @@
 
     "simplehomes.config.title": "Настройки Simple Homes",
 
-    "simplehomes.config.common.allowWarpPoints": "Разрешить варп-точки",
-    "simplehomes.config.common.allowWarpPoints.desc": "Разрешить установку варп-точек.",
-    "simplehomes.config.common.maximumWarpPoints": "Максимум варп-точек",
-    "simplehomes.config.common.maximumWarpPoints.desc": "Максимум варп-точек для одного игрока.",
+    "simplehomes.config.general.allowWarpPoints": "Разрешить варп-точки",
+    "simplehomes.config.general.allowWarpPoints.desc": "Разрешить установку варп-точек.",
+    "simplehomes.config.general.maximumWarpPoints": "Максимум варп-точек",
+    "simplehomes.config.general.maximumWarpPoints.desc": "Максимум варп-точек для одного игрока.",
 
     "simplehomes.commands.argument.warp.doesNotExists": "Варп-точки с именем \"%s\" не существует",
     "simplehomes.commands.argument.playerData.doesNotExists": "У игрока \"%s\" нет дома",

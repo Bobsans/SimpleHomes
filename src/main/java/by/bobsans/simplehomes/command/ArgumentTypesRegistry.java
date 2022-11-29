@@ -11,16 +11,16 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
 public class ArgumentTypesRegistry {
-    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> REGISTRY = DeferredRegister.create(Registry.COMMAND_ARGUMENT_TYPE_REGISTRY, Reference.MODID);
+    public static final DeferredRegister<ArgumentTypeInfo<?, ?>> REGISTRY = DeferredRegister.create(Registry.COMMAND_ARGUMENT_TYPE_REGISTRY, Reference.MOD_ID);
 
     public static final RegistryObject<SingletonArgumentInfo<PlayerWithHomeArgument>> PLAYER_WITH_HOME = REGISTRY
-        .register(Reference.MODID + "_player_data", () -> ArgumentTypeInfos.registerByClass(
+        .register(Reference.MOD_ID + "_player_data", () -> ArgumentTypeInfos.registerByClass(
             PlayerWithHomeArgument.class,
             SingletonArgumentInfo.contextFree(PlayerWithHomeArgument::userName)
         ));
 
     public static final RegistryObject<SingletonArgumentInfo<WarpPointArgument>> WARP_POINT = REGISTRY
-        .register(Reference.MODID + "_warp_point", () -> ArgumentTypeInfos.registerByClass(
+        .register(Reference.MOD_ID + "_warp_point", () -> ArgumentTypeInfos.registerByClass(
             WarpPointArgument.class,
             SingletonArgumentInfo.contextFree(WarpPointArgument::warpPoint)
         ));

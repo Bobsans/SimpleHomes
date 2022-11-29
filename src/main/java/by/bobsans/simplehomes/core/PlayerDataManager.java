@@ -17,7 +17,7 @@ import java.util.Map;
 
 
 public class PlayerDataManager extends SavedData {
-    private static final String DATA_NAME = Reference.MODID;
+    private static final String DATA_NAME = Reference.MOD_ID;
     private final Map<String, PlayerData> data = new HashMap<>();
     private static final PlayerDataManager clientInstance = new PlayerDataManager();
 

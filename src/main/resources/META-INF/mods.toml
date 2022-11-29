@@ -4,7 +4,7 @@ license = "All rights reserved"
 
 [[mods]]
     modId = "simplehomes"
-    version = "1.2.1"
+    version = "1.2.2"
     displayName = "SimpleHomes"
     updateJSONURL = "https://minecraft.darkboy.ru/api/check-mod-updates/simplehomes.json"
     displayURL = "https://minecraft.darkboy.ru/mods/simplehomes"

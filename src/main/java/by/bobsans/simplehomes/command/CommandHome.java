@@ -49,7 +49,7 @@ public class CommandHome extends BaseCommand {
         playerData.setHome(new WarpPoint(player, "home"));
         manager.setDirty();
 
-        sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.setHome"));
+        sendFeedback(context.getSource(), Component.translatable(Reference.MOD_ID + ".commands.setHome"));
 
         return Command.SINGLE_SUCCESS;
     }
@@ -63,12 +63,12 @@ public class CommandHome extends BaseCommand {
 
             if (targetPlayerData.home != null) {
                 PlayerTeleporter.teleport(player, targetPlayerData.home);
-                sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.meet", targetPlayerData.name));
+                sendFeedback(context.getSource(), Component.translatable(Reference.MOD_ID + ".commands.meet", targetPlayerData.name));
             } else {
-                throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.meet.hasNoHome", targetPlayerData.name));
+                throw new CommandRuntimeException(Component.translatable(Reference.MOD_ID + ".commands.meet.hasNoHome", targetPlayerData.name));
             }
         } else {
-            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.meet.playerNotFound", targetUserName));
+            throw new CommandRuntimeException(Component.translatable(Reference.MOD_ID + ".commands.meet.playerNotFound", targetUserName));
         }
 
         return Command.SINGLE_SUCCESS;
@@ -80,9 +80,9 @@ public class CommandHome extends BaseCommand {
 
         if (playerData.home != null) {
             PlayerTeleporter.teleport(player, playerData.home);
-            sendFeedback(context.getSource(), Component.translatable(Reference.MODID + ".commands.goHome"));
+            sendFeedback(context.getSource(), Component.translatable(Reference.MOD_ID + ".commands.goHome"));
         } else {
-            throw new CommandRuntimeException(Component.translatable(Reference.MODID + ".commands.goHome.notSet"));
+            throw new CommandRuntimeException(Component.translatable(Reference.MOD_ID + ".commands.goHome.notSet"));
         }
 
         return Command.SINGLE_SUCCESS;

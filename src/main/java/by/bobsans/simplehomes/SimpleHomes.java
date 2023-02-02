@@ -40,9 +40,7 @@ public class SimpleHomes {
     public void setup(final FMLCommonSetupEvent event) {
         NetworkingManager.init();
 
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> {
-            ConfigScreen.register(Reference.MOD_ID, (minecraft, screen) -> new ConfigScreen());
-        });
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> ConfigScreen.register(Reference.MOD_ID, (minecraft, screen) -> new ConfigScreen()));
     }
 
     @SubscribeEvent

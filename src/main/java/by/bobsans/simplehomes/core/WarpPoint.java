@@ -1,7 +1,7 @@
 package by.bobsans.simplehomes.core;
 
 import by.bobsans.simplehomes.utils.NBTSerialized;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -30,7 +30,7 @@ public class WarpPoint implements NBTSerialized {
 
     public WarpPoint(CompoundTag tag) {
         this.name = tag.getString("name");
-        this.world = ResourceKey.create(Registry.DIMENSION_REGISTRY, new ResourceLocation(tag.getString("world")));
+        this.world = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(tag.getString("world")));
         this.x = tag.getDouble("x");
         this.y = tag.getDouble("y");
         this.z = tag.getDouble("z");
